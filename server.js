@@ -41,11 +41,21 @@ function checkAuthenticated(req, res, next) {
 }
 
 app.get('/', checkAuthenticated, (req, res) => {
-    res.render('index.ejs', { name: req.user})
+    res.render('index.ejs', { name: req.user.name})
 })
 
 app.get('/login', (req, res) => {
    res.render('login.ejs')
+})
+
+app.post('/logout', (req, res, next) => {
+   req.logout(error => {
+      if (error) {
+         return next(error)
+      }
+
+      res.redirect('/login')
+   })
 })
 
 app.get('/register', (req, res) => {
