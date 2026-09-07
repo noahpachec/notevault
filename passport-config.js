@@ -1,4 +1,4 @@
-const { authenticate } = require('passport')
+// const { authenticate } = require('passport')
 const bcrypt = require('bcrypt')
 
 const LocalStrategy = require('passport-local')
