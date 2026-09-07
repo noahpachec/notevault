@@ -2,6 +2,12 @@ if (process.env.NODE_ENV !== 'production') {
    require('dotenv').config()
 }
 
+const {
+   getUserByEmail,
+   getUserById,
+   createUser
+} = require('./database')
+
 const express = require('express')
 const app = express()
 const bcrypt = require('bcrypt')
@@ -11,12 +17,12 @@ const session = require('express-session')
 const initialisePassport = require('./passport-config')
 const passport = require('passport')
 
-const users = []
+// const users = []
 
 initialisePassport(
    passport,
-   email => users.find(user => user.email === email),
-   id => users.find(user => user.id === id)
+   getUserByEmail,
+   getUserById
 )
 
 
@@ -74,20 +80,15 @@ app.post('/register', async (req, res) => {
    try {
       const hashedPassword = await bcrypt.hash(req.body.password, 10)
 
-      users.push({
-            id: Date.now().toString(),
-            name: req.body.name,
-            email: req.body.email,
-            password: hashedPassword
-         })
+      createUser(req.body.name, req.body.email, hashedPassword)
 
          res.redirect('/login')
 
-   } catch {
-
+   } catch (error) {
+      console.log(error)
       res.redirect('/register')
    }
-   console.log(users)
+
 })
 
   app.listen(3000)
