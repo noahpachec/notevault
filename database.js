@@ -42,11 +42,24 @@ const findUserByEmailStatement = db.prepare(`
     WHERE email = ?
     `)
 
+
 const findUserByIdStatement = db.prepare(`
     SELECT id, name, email, password_hash
     FROM users
     WHERE id = ?
     `)
+
+const findNotesByUser = db.prepare(`
+    SELECT id, user_id, ciphertext, iv, crypto_version, created_at, updated_at
+    FROM notes
+    WHERE user_id = ?
+    ORDER BY updated_at DESC
+    `)
+
+function getNotesByUserId(userId) {
+    return findNotesByUser.all(userId)
+}
+
 
 function getUserByEmail(email) {
     return findUserByEmailStatement.get(email)
@@ -68,9 +81,7 @@ function createUser(name, email, passwordHash) {
     return result.lastInsertRowid
 }
 
-    // INSERT INTO users (name, email)
-    // VALUES ('Nozlet', nozlet@giplet.comlet)
 
 module.exports = {
-    db, getUserByEmail, createUser, getUserById
+    db, getUserByEmail, createUser, getUserById, getNotesByUserId
 }
