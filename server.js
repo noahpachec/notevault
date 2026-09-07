@@ -11,13 +11,15 @@ const session = require('express-session')
 const initialisePassport = require('./passport-config')
 const passport = require('passport')
 
+const users = []
+
 initialisePassport(
    passport,
    email => users.find(user => user.email === email),
    id => users.find(user => user.id === id)
 )
 
-const users = []
+
 
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({ extended: false }))
