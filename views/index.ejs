@@ -1,5 +1,35 @@
-<h1>Hi there, <%=name%>.</h1>
-<p>Your encryption salt is <%=encryptionSalt%></p>
-<form action="/logout" method="POST">
-    <button type="submit">Log Out</button>
+
+<main id="notes-app" data-encryption-salt="<%= encryptionSalt %>">
+
+
+    <h1>Hi there, <%=name%>.</h1>
+
+    <form action="/logout" method="POST">
+        <button type="submit">Log Out</button>
+    </form>
+
+
+<form id="unlock-form">
+    <label for="encryption-passphrase">Encryption Passphrase</label>
+    <input
+        type="password"
+        id="encryption-passphrase"
+        required
+    >
+    <button type="submit">Unlock Notes</button>
 </form>
+
+<p id="unlock-status"></p>
+
+<section id="note-controls" hidden>
+    <form id="create-note-form">
+        <label for="note-contents">
+            <textarea id="note-contents"></textarea>
+            <button type="submit">Save note</button>
+        </label>
+    </form>
+    <p id="note-status"></p>
+</section>
+
+<script src="/crypto.js" defer></script>
+</main>

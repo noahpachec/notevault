@@ -40,6 +40,7 @@ app.use(session({
 
 app.use(passport.initialize())
 app.use(passport.session())
+app.use(express.static('public'))
 
 
 function checkAuthenticated(req, res, next) {
@@ -52,8 +53,8 @@ function checkAuthenticated(req, res, next) {
 
 app.get('/', checkAuthenticated, (req, res) => {
     res.render('index.ejs',
-      { name: req.user.name},
-      {encryptionSalt: req.user.encryption_salt}
+      { name: req.user.name,
+         encryptionSalt: req.user.encryption_salt}
    )
 })
 
