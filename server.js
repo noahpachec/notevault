@@ -6,7 +6,8 @@ const {
    getUserByEmail,
    getUserById,
    createUser,
-   createNote
+   createNote,
+   getNotesByUserId
 } = require('./database')
 
 const { randomBytes } = require('node:crypto')
@@ -101,7 +102,7 @@ app.post('/register', async (req, res) => {
 
 })
 
-app.post('/api/notes', checkAuthenticated, (req, res) => {
+app.post('/api/notes', checkApiAuthenticated, (req, res) => {
    const ciphertext = req.body.ciphertext
    const iv = req.body.iv
    const cryptoVersion = req.body.cryptoVersion
@@ -118,4 +119,23 @@ app.post('/api/notes', checkAuthenticated, (req, res) => {
    return res.status(201).json({ id: noteId })
 })
 
-  app.listen(3000)
+
+
+function checkApiAuthenticated(req, res, next) {
+   if (req.isAuthenticated()) {
+      return next()
+   }
+
+   return res.status(401).json({
+      error: 'Authentication required'
+   })
+}
+
+app.get('/api/notes', checkApiAuthenticated, (req, res) => {
+   const userNotes = getNotesByUserId(req.user.id)
+
+   return res.json(userNotes)
+})
+
+
+app.listen(3000)

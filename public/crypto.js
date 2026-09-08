@@ -150,9 +150,27 @@ createNoteForm.addEventListener('submit', async (event) => {
         if (decryptedNote !== plaintext) {
             throw new Error('Round-trip mismatch')
         }
+        
+        const response = await fetch('/api/notes', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(encryptedNote)
+        })
 
-        noteStatus.textContent = 'Encryption round trip succeeded'
+        if (!response.ok) {
+            throw new Error('Server rejected note')
+        }
+
+        const savedNote = await response.json()
+
+        noteContentsInput.value = ''
+        noteStatus.textContent = `Note ${savedNote.id} saved`
+
     } catch {
         noteStatus.textContent = 'Encryption round trip failed'
     }
+
+    
 })
