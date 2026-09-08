@@ -9,7 +9,8 @@ db.exec(`
         id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
         email TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL
+        password_hash TEXT NOT NULL,
+        encryption_salt TEXT NOT NULL
     )
     `)
 
@@ -37,14 +38,14 @@ db.exec(`
 
 
 const findUserByEmailStatement = db.prepare(`
-    SELECT id, name, email, password_hash
+    SELECT id, name, email, password_hash, encryption_salt
     FROM users
     WHERE email = ?
     `)
 
 
 const findUserByIdStatement = db.prepare(`
-    SELECT id, name, email, password_hash
+    SELECT id, name, email, password_hash, encryption_salt
     FROM users
     WHERE id = ?
     `)
@@ -96,8 +97,8 @@ function getNoteByIdForUser(noteId, userId) {
 
 
 const insertUserStatement = db.prepare(`
-    INSERT INTO users (name, email, password_hash)
-    VALUES (?, ?, ?)
+    INSERT INTO users (name, email, password_hash, encryption_salt)
+    VALUES (?, ?, ?, ?)
     `)
 
 const insertNoteStatement = db.prepare(`
@@ -107,8 +108,8 @@ const insertNoteStatement = db.prepare(`
 
 
 
-function createUser(name, email, passwordHash) {
-    const result = insertUserStatement.run(name, email, passwordHash)
+function createUser(name, email, passwordHash, encryptionSalt) {
+    const result = insertUserStatement.run(name, email, passwordHash, encryptionSalt)
     return result.lastInsertRowid
 }
 

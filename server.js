@@ -8,6 +8,8 @@ const {
    createUser
 } = require('./database')
 
+const { randomBytes } = require('node:crypto')
+
 const express = require('express')
 const app = express()
 const bcrypt = require('bcrypt')
@@ -49,7 +51,10 @@ function checkAuthenticated(req, res, next) {
 }
 
 app.get('/', checkAuthenticated, (req, res) => {
-    res.render('index.ejs', { name: req.user.name})
+    res.render('index.ejs',
+      { name: req.user.name},
+      {encryptionSalt: req.user.encryption_salt}
+   )
 })
 
 app.get('/login', (req, res) => {
@@ -80,7 +85,9 @@ app.post('/register', async (req, res) => {
    try {
       const hashedPassword = await bcrypt.hash(req.body.password, 10)
 
-      createUser(req.body.name, req.body.email, hashedPassword)
+      const encryptionSalt = randomBytes(16).toString('base64')
+
+      createUser(req.body.name, req.body.email, hashedPassword, encryptionSalt)
 
          res.redirect('/login')
 
