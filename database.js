@@ -56,10 +56,25 @@ const findNotesByUser = db.prepare(`
     ORDER BY updated_at DESC
     `)
 
-function getNotesByUserId(userId) {
-    return findNotesByUser.all(userId)
-}
+const getNoteByIdForUserStatement = db.prepare(`
+    SELECT id, user_id, ciphertext, iv, crypto_version, created_at, updated_at
+    FROM notes
+    WHERE id = ?
+    AND user_id = ?
+    `)
 
+const updateNoteForUserStatement = db.prepare(`
+    UPDATE notes
+    SET ciphertext = ?, iv = ?, crypto_version = ?, updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+    AND user_id = ?
+    `)
+
+const deleteNoteForUserStatement = db.prepare(`
+    DELETE FROM notes
+    WHERE id = ?
+    AND user_id = ?
+    `)
 
 function getUserByEmail(email) {
     return findUserByEmailStatement.get(email)
@@ -69,6 +84,15 @@ function getUserById(id) {
     return findUserByIdStatement.get(id)
 }
 
+function getNotesByUserId(userId) {
+    return findNotesByUser.all(userId)
+}
+
+
+function getNoteByIdForUser(noteId, userId) {
+    return getNoteByIdForUserStatement.get(noteId, userId)
+}
+
 
 
 const insertUserStatement = db.prepare(`
@@ -76,12 +100,43 @@ const insertUserStatement = db.prepare(`
     VALUES (?, ?, ?)
     `)
 
+const insertNoteStatement = db.prepare(`
+    INSERT INTO notes (user_id, ciphertext, iv, crypto_version)
+    VALUES (?, ?, ?, ?)
+    `)
+
+
+
 function createUser(name, email, passwordHash) {
     const result = insertUserStatement.run(name, email, passwordHash)
     return result.lastInsertRowid
 }
 
+function createNote(userId, ciphertext, iv, cryptoVersion = 1) {
+    const result = insertNoteStatement.run(userId, ciphertext, iv, cryptoVersion)
+    return result.lastInsertRowid
+}
+
+function updateNoteForUser(noteId, userId, ciphertext, iv,  cryptoVersion = 1) {
+    const result = updateNoteForUserStatement.run(ciphertext, iv, cryptoVersion, noteId, userId)
+    return result.changes
+}
+
+function deleteNoteForUser(noteId, userId) {
+    const result = deleteNoteForUserStatement.run(noteId, userId)
+    return result.changes
+}
+
 
 module.exports = {
-    db, getUserByEmail, createUser, getUserById, getNotesByUserId
+    db,
+    getUserByEmail,
+    createUser,
+    getUserById,
+    getNotesByUserId,
+    createNote,
+    getNoteByIdForUser,
+    updateNoteForUser,
+    deleteNoteForUser
+
 }
