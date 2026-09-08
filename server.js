@@ -5,7 +5,8 @@ if (process.env.NODE_ENV !== 'production') {
 const {
    getUserByEmail,
    getUserById,
-   createUser
+   createUser,
+   createNote
 } = require('./database')
 
 const { randomBytes } = require('node:crypto')
@@ -31,6 +32,7 @@ initialisePassport(
 
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({ extended: false }))
+app.use(express.json({ limit: '100kb' }))
 app.use(flash())
 app.use(session({
    secret: process.env.SESSION_SECRET,
@@ -97,6 +99,23 @@ app.post('/register', async (req, res) => {
       res.redirect('/register')
    }
 
+})
+
+app.post('/api/notes', checkAuthenticated, (req, res) => {
+   const ciphertext = req.body.ciphertext
+   const iv = req.body.iv
+   const cryptoVersion = req.body.cryptoVersion
+
+   const validCiphertext = typeof ciphertext === 'string' && ciphertext.length > 0
+   const validIv = typeof iv === 'string' && iv.length > 0
+   const validCryptoVersion = cryptoVersion === 1
+
+   if (!validCiphertext || !validIv || !validCryptoVersion) {
+      return res.status(400).json({ error: 'Invalid encrypted note'})
+   }
+
+   const noteId = createNote(req.user.id, ciphertext, iv, cryptoVersion)
+   return res.status(201).json({ id: noteId })
 })
 
   app.listen(3000)

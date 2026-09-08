@@ -2,6 +2,9 @@ const unlockForm = document.querySelector('#unlock-form')
 const passphraseInput = document.querySelector('#encryption-passphrase')
 const unlockStatus = document.querySelector('#unlock-status')
 const noteControls = document.querySelector('#note-controls')
+const createNoteForm = document.querySelector('#create-note-form')
+const noteContentsInput = document.querySelector('#note-contents')
+const noteStatus = document.querySelector('#note-status')
 
 
 
@@ -24,6 +27,8 @@ function bytesToBase64(bytes) {
     for (const byte of bytes) {
         binaryString += String.fromCharCode(byte)
     }
+
+    return btoa(binaryString)
 }
 
 async function encryptText(plaintext, key) {
@@ -124,6 +129,30 @@ unlockForm.addEventListener('submit' , async (event) => {
     }
 
 
-    
-
 });
+
+createNoteForm.addEventListener('submit', async (event) => {
+
+    event.preventDefault()
+    
+    if (activeEncryptionKey ===  null) {
+        noteStatus.textContent = 'Unlock notes first'
+        return
+    }
+
+    const plaintext = noteContentsInput.value
+
+    try {
+        const encryptedNote = await encryptText(plaintext, activeEncryptionKey)
+
+        const decryptedNote = await decryptText(encryptedNote, activeEncryptionKey)
+
+        if (decryptedNote !== plaintext) {
+            throw new Error('Round-trip mismatch')
+        }
+
+        noteStatus.textContent = 'Encryption round trip succeeded'
+    } catch {
+        noteStatus.textContent = 'Encryption round trip failed'
+    }
+})
