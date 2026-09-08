@@ -21,7 +21,51 @@ function base64ToBytes(base64) {
 function bytesToBase64(bytes) {
     let binaryString = ''
 
-    for (const byte of bytes)
+    for (const byte of bytes) {
+        binaryString += String.fromCharCode(byte)
+    }
+}
+
+async function encryptText(plaintext, key) {
+    const plaintextBytes = new TextEncoder().encode(plaintext)
+    const ivBytes = window.crypto.getRandomValues(new Uint8Array(12))
+
+    const ciphertextBuffer = 
+        await window.crypto.subtle.encrypt(
+            {
+                name: 'AES-GCM',
+                iv: ivBytes
+            },
+            key,
+            plaintextBytes
+        )
+
+        return {
+            ciphertext: bytesToBase64(
+                new Uint8Array(ciphertextBuffer)
+            ),
+            iv: bytesToBase64(ivBytes),
+            cryptoVersion: 1
+        }
+}
+
+async function decryptText(encryptedNote, key) {
+    const ciphertextBytes =
+        base64ToBytes(encryptedNote.ciphertext)
+    const ivBytes = 
+        base64ToBytes(encryptedNote.iv)
+
+    const plaintextBuffer =
+        await window.crypto.subtle.decrypt(
+            {
+                name: 'AES-GCM',
+                iv: ivBytes
+            },
+            key,
+            ciphertextBytes
+        )
+    
+        return new TextDecoder().decode(plaintextBuffer)
 }
 
 async function deriveEncryptionKey(passphrase, saltBase64) {
