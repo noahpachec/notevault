@@ -5,6 +5,7 @@ const noteControls = document.querySelector('#note-controls')
 const createNoteForm = document.querySelector('#create-note-form')
 const noteContentsInput = document.querySelector('#note-contents')
 const noteStatus = document.querySelector('#note-status')
+const notesList = document.querySelector('#notes-list')
 
 
 
@@ -104,6 +105,50 @@ async function deriveEncryptionKey(passphrase, saltBase64) {
     
 }
 
+async function fetchEncryptedNotes() {
+    const response = await fetch('/api/notes')
+
+    if (response.status === 401) {
+        throw new Error('Authentication required')
+    }
+
+    if (!response.ok) {
+        throw new Error('Unable to load notes')
+    }
+    
+    return response.json()
+}
+
+async function renderDecryptedNotes(encryptedNotes, key) {
+    const fragment = document.createDocumentFragment()
+
+    for (const encryptedNote of encryptedNotes) {
+        if (encryptedNote.crypto_version !== 1) {
+            throw new Error('Unsupported crypto version')
+        }
+
+        const plaintext = await decryptText(
+            encryptedNote,
+            key
+        )
+
+        const article = document.createElement('article')
+        article.dataset.noteId = String(encryptedNote.id)
+
+        const contents = document.createElement('pre')
+        contents.textContent = plaintext
+
+        article.appendChild(contents)
+        fragment.appendChild(article)
+    }
+
+    notesList.replaceChildren(fragment)
+
+    if (encryptedNotes.length === 0) {
+        notesList.textContent = 'No notes yet'
+    }
+}
+
 unlockForm.addEventListener('submit' , async (event) => {
     event.preventDefault();
     const passphrase = passphraseInput.value;
@@ -116,13 +161,24 @@ unlockForm.addEventListener('submit' , async (event) => {
         passphrase,
         saltBase64
     )
-        unlockStatus.textContent = "Encryption key ready"
+        
 
+        const encryptedNotes = await fetchEncryptedNotes()
+        console.log('Encrypted note count: ', encryptedNotes.length)
+
+        await renderDecryptedNotes(encryptedNotes, activeEncryptionKey)
+
+        unlockStatus.textContent = "Notes unlocked"
         noteControls.hidden = false
+        unlockForm.hidden = true
+
+        
+
+        
      
     } catch {
         activeEncryptionKey = null
-        unlockStatus.textContent = "Unable to derive encryption key"
+        unlockStatus.textContent = "Unable to unlock notes"
         noteControls.hidden = true
     } finally {
         passphraseInput.value = ''
@@ -164,6 +220,12 @@ createNoteForm.addEventListener('submit', async (event) => {
         }
 
         const savedNote = await response.json()
+        const encryptedNotes = await fetchEncryptedNotes()
+        
+        await renderDecryptedNotes(
+            encryptedNotes,
+            activeEncryptionKey
+        )
 
         noteContentsInput.value = ''
         noteStatus.textContent = `Note ${savedNote.id} saved`
