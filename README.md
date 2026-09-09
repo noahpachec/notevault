@@ -2,7 +2,6 @@
 
 NoteVault is a web-based note-taking application built with Node.js, Express, EJS and SQLite. Users can register, log in, and create, read, edit and delete their own encrypted notes.
 
-Passwordless authentication was an optional bonus and is not implemented.
 
 ## How to run
 
