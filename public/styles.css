@@ -1,18 +1,113 @@
-/* * {
-    box-sizing: border-box;
-    background-color: black;
-    color: white
+:root {
+    --5: #041421;
+    --4: #042630;
+    --3: #4c7273;
+    --2: #86b9b0;
+    --1: #d0d6d6;
+    --text: rgb(236, 238, 238);
 }
 
-main {
-    background-color: black;
-    color: white;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: var(--text);
+}
+
+header {
+    font-size: 1.5rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: var(--5);
+    width: 100%;
+    padding: 20px;
+    z-index: 10;
+}
+
+section {
+    /* height: 10px; */
+    background-color: var(--5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+    padding-top: 20px;
 }
 
 input {
+    color: black;
+}
+
+textcontent {
+    color: black;
+}
+
+#login-card, #register-card{
+    background-color: var(--4);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    max-width: 400px;
+    height: 400px;
+}
+
+#login-card h1, #register-card h1{
+    margin: 20px 0px 80px 0px;
+}
+
+#login-form, #register-form {
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+}
+
+#email, #password, #login-form button, #name, #register-form button{
+    font-size: .9rem;
+    border-radius: 5px;
+    height: 30px;
+    width: 250px;
+    border: none;
+
+    margin: 5px 0 5px 0;
+}
+
+#email, #password, #name {
+    background-color: var(--2);
+}
+
+#login-form button, #register-form button {
+    background-color: var(--3);
+    transition: background-color 0.5s ease;
+
+}
+
+#login-form button:hover, #register-form button:hover {
+    background-color: var(--2);
+
+}
+
+
+input {
+    padding-left: 8px;
+}
+
+
+
+#register-redirect, #login-redirect {
+    font-size: 0.9rem;
+    margin-top: 5px;
+    text-decoration: none;
+    color: var(--2);
+    transition: color .5s ease;
+}
+
+#register-redirect:hover, #login-redirect:hover {
     color: white;
 }
 
-textconten {
-    color: white;
-} */
+

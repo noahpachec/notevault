@@ -38,9 +38,16 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.json({ limit: '100kb' }))
 app.use(flash())
 app.use(session({
+   name: 'notevault.sid',
    secret: process.env.SESSION_SECRET,
    resave: false,
-   saveUninitialized: false
+   saveUninitialized: false,
+   cookie: {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 1000
+   }
 }))
 
 app.use(passport.initialize())
@@ -72,8 +79,15 @@ app.post('/logout', (req, res, next) => {
       if (error) {
          return next(error)
       }
-
-      res.redirect('/login')
+   
+   req.session.destroy(error => {
+      if (error) {
+         return next(error)
+      }
+      res.clearCookie('notevault.sid')
+      return res.redirect('/login')
+      
+      })
    })
 })
 
