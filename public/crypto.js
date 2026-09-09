@@ -120,12 +120,16 @@ async function fetchEncryptedNotes() {
 }
 
 async function renderDecryptedNotes(encryptedNotes, key) {
+
     const fragment = document.createDocumentFragment()
+
 
     for (const encryptedNote of encryptedNotes) {
         if (encryptedNote.crypto_version !== 1) {
             throw new Error('Unsupported crypto version')
         }
+
+        
 
         const plaintext = await decryptText(
             encryptedNote,
@@ -138,7 +142,16 @@ async function renderDecryptedNotes(encryptedNotes, key) {
         const contents = document.createElement('pre')
         contents.textContent = plaintext
 
+        const deleteButton = document.createElement('button')
+        deleteButton.type = "button"
+        deleteButton.textContent = "Delete"
+
+        deleteButton.addEventListener('click', () => {
+        deleteNote(encryptedNote.id)
+        })
+
         article.appendChild(contents)
+        article.appendChild(deleteButton)
         fragment.appendChild(article)
     }
 
@@ -146,6 +159,41 @@ async function renderDecryptedNotes(encryptedNotes, key) {
 
     if (encryptedNotes.length === 0) {
         notesList.textContent = 'No notes yet'
+    }
+
+
+}
+
+async function deleteNote(noteId) {
+    const confirmed = window.confirm(
+        'Permanently delete this note?'
+    )
+
+    if (!confirmed) {
+        return
+    }
+
+    try {
+        const response = await fetch(
+            `/api/notes/${encodeURIComponent(noteId)}`,
+            {
+                method: 'DELETE'
+            })
+
+            if (!response.ok) {
+                throw new Error('Server rejected deletion')
+            }
+
+            const encryptedNotes = await fetchEncryptedNotes()
+
+            await renderDecryptedNotes(
+                encryptedNotes,
+                activeEncryptionKey
+            )
+
+            noteStatus.textContent = 'Note deleted'
+    } catch {
+        noteStatus.textContent = 'Unable to delete note'
     }
 }
 

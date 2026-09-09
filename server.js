@@ -7,7 +7,8 @@ const {
    getUserById,
    createUser,
    createNote,
-   getNotesByUserId
+   getNotesByUserId,
+   deleteNoteForUser
 } = require('./database')
 
 const { randomBytes } = require('node:crypto')
@@ -136,6 +137,29 @@ app.get('/api/notes', checkApiAuthenticated, (req, res) => {
 
    return res.json(userNotes)
 })
+
+app.delete('/api/notes/:id', checkApiAuthenticated, (req, res) => {
+
+   const noteId = Number(req.params.id)
+
+   if (!Number.isSafeInteger(noteId) || noteId <= 0) {
+      return res.status(400).json({
+         error: 'Invalid note ID'
+      })
+   }
+
+   const deleteCount = deleteNoteForUser(noteId, req.user.id)
+   if (deleteCount === 0) {
+         return res.status(404).json({
+            error: 'Note not found'
+         })
+   }
+
+   return res.sendStatus(204)
+
+})
+
+
 
 
 app.listen(3000)
