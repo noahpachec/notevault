@@ -73,7 +73,6 @@ The login password and encryption passphrase have different purposes. The login 
 
 This design protects note contents from an administrator who passively reads the database. It does **not** protect against a malicious administrator who changes the JavaScript sent to the browser to capture a passphrase or plaintext.
 
-Current production limitations include Express Session's in-memory session store, no login rate limiting, distinguishable login failure messages, and no explicit CSRF token or Content Security Policy. These should be addressed before exposing the application publicly.
 
 ## Main files
 
