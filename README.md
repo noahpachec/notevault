@@ -76,9 +76,9 @@ This design protects note contents from an administrator who passively reads the
 
 ## Main files
 
-- `server.js` — Express routes, sessions, authentication and note API
-- `passport-config.js` — Passport Local strategy and session serialization
-- `database.js` — SQLite schema and prepared queries
-- `public/crypto.js` — browser-side key derivation, encryption, decryption and note UI logic
-- `views/` — EJS pages
-- `public/styles.css` — application styling
+- `server.js`: Express routes, sessions, authentication and note API
+- `passport-config.js`: Passport Local strategy and session serialization
+- `database.js`: SQLite schema and prepared queries
+- `public/crypto.js`: browser-side key derivation, encryption, decryption and note UI logic
+- `views/`: EJS pages
+- `public/styles.css`: application styling
