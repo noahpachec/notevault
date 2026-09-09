@@ -27,7 +27,9 @@
     <form id="create-note-form">
         <label for="note-contents">
             <textarea id="note-contents" required></textarea>
-            <button type="submit">Save note</button>
+
+            <button type="submit" id="save-note-button">Save note</button>
+            <button type="button" id="cancel-edit-button" hidden>Cancel edit</button>
         </label>
     </form>
     <p id="note-status"></p>

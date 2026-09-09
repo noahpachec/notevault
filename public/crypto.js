@@ -6,12 +6,15 @@ const createNoteForm = document.querySelector('#create-note-form')
 const noteContentsInput = document.querySelector('#note-contents')
 const noteStatus = document.querySelector('#note-status')
 const notesList = document.querySelector('#notes-list')
+const saveNoteButton = document.querySelector('#save-note-button')
+const cancelEditButton = document.querySelector('#cancel-edit-button')
 
 
 
 const PBKDF2_ITERATIONS = 600000
 
 let activeEncryptionKey = null
+let editingNoteId = null
 
 function base64ToBytes(base64) {
     const binaryString = atob(base64)
@@ -146,11 +149,25 @@ async function renderDecryptedNotes(encryptedNotes, key) {
         deleteButton.type = "button"
         deleteButton.textContent = "Delete"
 
+        const editButton = document.createElement('button')
+        editButton.type = 'button'
+        editButton.textContent = 'Edit'
+
+        editButton.addEventListener('click', () => {
+            editingNoteId = encryptedNote.id
+            noteContentsInput.value = plaintext
+            saveNoteButton.textContent = 'Update note'
+            cancelEditButton.hidden = false
+            noteStatus.textContent = `Editing note`
+            noteContentsInput.focus()
+        })
+
         deleteButton.addEventListener('click', () => {
         deleteNote(encryptedNote.id)
         })
 
         article.appendChild(contents)
+        article.appendChild(editButton)
         article.appendChild(deleteButton)
         fragment.appendChild(article)
     }
@@ -246,8 +263,14 @@ createNoteForm.addEventListener('submit', async (event) => {
 
     const plaintext = noteContentsInput.value
 
+    const noteIdBeingEdited = editingNoteId
+    const isEditing = noteIdBeingEdited !== null
+
     try {
         const encryptedNote = await encryptText(plaintext, activeEncryptionKey)
+
+        const requestUrl = isEditing ? `/api/notes/${encodeURIComponent(noteIdBeingEdited)}` : `/api/notes`
+        const requestMethod = isEditing ? 'PUT' : 'POST'
 
         const decryptedNote = await decryptText(encryptedNote, activeEncryptionKey)
 
@@ -255,8 +278,8 @@ createNoteForm.addEventListener('submit', async (event) => {
             throw new Error('Round-trip mismatch')
         }
         
-        const response = await fetch('/api/notes', {
-        method: 'POST',
+        const response = await fetch(requestUrl, {
+        method: requestMethod,
         headers: {
             'Content-Type': 'application/json'
         },
@@ -267,7 +290,16 @@ createNoteForm.addEventListener('submit', async (event) => {
             throw new Error('Server rejected note')
         }
 
-        const savedNote = await response.json()
+        let successMessage
+
+        if (isEditing) {
+            successMessage = `Note updated`
+        } else {
+            const savedNote = await response.json()
+            successMessage = `Note ${savedNote.id} saved`
+        }
+
+
         const encryptedNotes = await fetchEncryptedNotes()
         
         await renderDecryptedNotes(
@@ -275,12 +307,25 @@ createNoteForm.addEventListener('submit', async (event) => {
             activeEncryptionKey
         )
 
+        editingNoteId = null
         noteContentsInput.value = ''
-        noteStatus.textContent = `Note ${savedNote.id} saved`
+        saveNoteButton.textContent = 'Save note'
+        cancelEditButton.hidden = true
+        noteStatus.textContent = successMessage
+
+
 
     } catch {
-        noteStatus.textContent = 'Encryption round trip failed'
+        noteStatus.textContent = 'Unable to save note'
     }
 
     
+})
+
+cancelEditButton.addEventListener('click', () => {
+    editingNoteId = null
+    noteContentsInput.value = ''
+    saveNoteButton.textContent = 'Save note'
+    cancelEditButton.hidden = true
+    noteStatus.textContent = ''
 })

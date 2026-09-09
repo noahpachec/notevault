@@ -186,7 +186,9 @@ app.put('/api/notes/:id', checkApiAuthenticated, (req, res) => {
    const changedCount = updateNoteForUser(noteId, req.user.id, ciphertext, iv, cryptoVersion)
 
    if (changedCount === 0) {
-      return res.status(404)
+      return res.status(404).json({
+         error: 'Note not found'
+      })
    }
 
    return res.sendStatus(204)
