@@ -8,7 +8,8 @@ const {
    createUser,
    createNote,
    getNotesByUserId,
-   deleteNoteForUser
+   deleteNoteForUser,
+   updateNoteForUser
 } = require('./database')
 
 const { randomBytes } = require('node:crypto')
@@ -159,7 +160,37 @@ app.delete('/api/notes/:id', checkApiAuthenticated, (req, res) => {
 
 })
 
+app.put('/api/notes/:id', checkApiAuthenticated, (req, res) => {
+   const noteId = Number(req.params.id)
 
+   if (!Number.isSafeInteger(noteId) || noteId <= 0) {
+      return res.status(400).json({
+         error: 'Invalid note ID'
+      })
+   }
+
+   const ciphertext =  req.body.ciphertext
+   const iv = req.body.iv
+   const cryptoVersion = req.body.cryptoVersion
+
+   const validCiphertext = typeof ciphertext === 'string' && ciphertext.length > 0
+   const validIv = typeof iv === 'string' && iv.length > 0
+   const validCryptoVersion = cryptoVersion === 1
+
+   if (!validCiphertext || !validIv || !validCryptoVersion) {
+      return res.status(400).json({
+         error: 'Invalid encrypted note'
+      })
+   }
+
+   const changedCount = updateNoteForUser(noteId, req.user.id, ciphertext, iv, cryptoVersion)
+
+   if (changedCount === 0) {
+      return res.status(404)
+   }
+
+   return res.sendStatus(204)
+})
 
 
 app.listen(3000)
