@@ -1,41 +1,56 @@
 <link rel="stylesheet" href="/styles.css">
 
-<header>NoteVault</header>
-<section id="notes-app" data-encryption-salt="<%= encryptionSalt %>">
-
-
-    <h1>Hi there, <%=name%>.</h1>
-
-    <form action="/logout" method="POST">
-        <button type="submit">Log Out</button>
+<header class="notes-header">
+    <span>NoteVault</span>
+    <form action="/logout" method="POST" id="logout-form">
+        <button type="submit">Log out</button>
     </form>
+</header>
 
+<main id="notes-app" data-encryption-salt="<%= encryptionSalt %>">
+    <div id="notes-shell">
+        <h1>Hi there, <%= name %>.</h1>
 
-<form id="unlock-form">
-    <label for="encryption-passphrase">Encryption Passphrase</label>
-    <input
-        type="password"
-        id="encryption-passphrase"
-        required
-    >
-    <button type="submit">Unlock Notes</button>
-</form>
+        <div id="unlock-card" class="notes-card">
+            <h2>Unlock your notes</h2>
+            <form id="unlock-form">
+                <label for="encryption-passphrase">Encryption passphrase</label>
+                <input
+                    type="password"
+                    id="encryption-passphrase"
+                    placeholder="Encryption passphrase"
+                    required
+                >
+                <button type="submit">Unlock notes</button>
+            </form>
+            <p id="unlock-status" class="status-message" aria-live="polite"></p>
+        </div>
 
-<p id="unlock-status"></p>
+        <section id="note-controls" hidden>
+            <div id="editor-card" class="notes-card">
+                <h2>Create a note</h2>
+                <form id="create-note-form">
+                    <label for="note-contents">Note contents</label>
+                    <textarea
+                        id="note-contents"
+                        placeholder="Write your note..."
+                        required
+                    ></textarea>
 
-<section id="note-controls" hidden>
-    <form id="create-note-form">
-        <label for="note-contents">
-            <textarea id="note-contents" required></textarea>
+                    <div class="form-actions">
+                        <button type="submit" id="save-note-button">Save note</button>
+                        <button type="button" id="cancel-edit-button" hidden>Cancel edit</button>
+                    </div>
+                </form>
+                <p id="note-status" class="status-message" aria-live="polite"></p>
+            </div>
 
-            <button type="submit" id="save-note-button">Save note</button>
-            <button type="button" id="cancel-edit-button" hidden>Cancel edit</button>
-        </label>
-    </form>
-    <p id="note-status"></p>
-    <h2>Your notes</h2>
-    <div id="notes-list"></div>
-</section>
+            <div id="saved-notes-card" class="notes-card">
+                <h2>Your notes</h2>
+                <div id="notes-list"></div>
+            </div>
+        </section>
+    </div>
+</main>
 
 <script src="/crypto.js" defer></script>
-</section>

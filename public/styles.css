@@ -110,4 +110,148 @@ input {
     color: white;
 }
 
+[hidden] {
+    display: none !important;
+}
+
+body {
+    background-color: var(--5);
+    font-family: Arial, sans-serif;
+}
+
+.notes-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#logout-form button,
+#unlock-form button,
+#create-note-form button,
+#notes-list button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--3);
+    cursor: pointer;
+    transition: background-color 0.5s ease;
+}
+
+#logout-form button:hover,
+#unlock-form button:hover,
+#create-note-form button:hover,
+#notes-list button:hover {
+    background-color: var(--2);
+}
+
+#notes-app {
+    display: block;
+    min-height: 100vh;
+    height: auto;
+    padding: 100px 20px 40px;
+}
+
+#notes-shell {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+#notes-shell > h1 {
+    margin-bottom: 20px;
+}
+
+.notes-card {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 24px;
+    border-radius: 10px;
+    background-color: var(--4);
+}
+
+.notes-card h2 {
+    margin-bottom: 18px;
+}
+
+#unlock-form,
+#create-note-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#encryption-passphrase,
+#note-contents {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    color: var(--5);
+    background-color: var(--2);
+    font: inherit;
+}
+
+#encryption-passphrase {
+    min-height: 38px;
+}
+
+#note-contents {
+    min-height: 140px;
+    resize: vertical;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.status-message {
+    min-height: 1.25rem;
+    margin-top: 12px;
+    color: var(--2);
+}
+
+#note-controls {
+    display: block;
+    width: 100%;
+    height: auto;
+    padding: 0;
+    background: none;
+}
+
+#notes-list {
+    display: grid;
+    gap: 12px;
+}
+
+#notes-list article {
+    padding: 16px;
+    border-radius: 7px;
+    background-color: var(--3);
+}
+
+#notes-list pre {
+    margin-bottom: 14px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font: inherit;
+}
+
+#notes-list button + button {
+    margin-left: 8px;
+}
+
+@media (max-width: 500px) {
+    header {
+        padding: 14px;
+    }
+
+    #notes-app {
+        padding: 85px 12px 24px;
+    }
+
+    .notes-card {
+        padding: 18px;
+    }
+}
 
