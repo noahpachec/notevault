@@ -2,7 +2,6 @@
 
 NoteVault is a web-based note-taking application built with Node.js, Express, EJS and SQLite. Users can register, log in, and create, read, edit and delete their own encrypted notes.
 
-Passwordless authentication was an optional bonus and is not implemented.
 
 ## How to run
 
@@ -74,13 +73,12 @@ The login password and encryption passphrase have different purposes. The login 
 
 This design protects note contents from an administrator who passively reads the database. It does **not** protect against a malicious administrator who changes the JavaScript sent to the browser to capture a passphrase or plaintext.
 
-Current production limitations include Express Session's in-memory session store, no login rate limiting, distinguishable login failure messages, and no explicit CSRF token or Content Security Policy. These should be addressed before exposing the application publicly.
 
 ## Main files
 
-- `server.js` — Express routes, sessions, authentication and note API
-- `passport-config.js` — Passport Local strategy and session serialization
-- `database.js` — SQLite schema and prepared queries
-- `public/crypto.js` — browser-side key derivation, encryption, decryption and note UI logic
-- `views/` — EJS pages
-- `public/styles.css` — application styling
+- `server.js`: Express routes, sessions, authentication and note API
+- `passport-config.js`: Passport Local strategy and session serialization
+- `database.js`: SQLite schema and prepared queries
+- `public/crypto.js`: browser-side key derivation, encryption, decryption and note UI logic
+- `views/`: EJS pages
+- `public/styles.css`: application styling
