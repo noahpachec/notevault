@@ -1,4 +1,4 @@
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production') { // load environment variables from .env when not running in production
    require('dotenv').config()
 }
 
@@ -23,7 +23,6 @@ const session = require('express-session')
 const initialisePassport = require('./passport-config')
 const passport = require('passport')
 
-// const users = []
 
 initialisePassport(
    passport,
@@ -34,19 +33,19 @@ initialisePassport(
 
 
 app.set('view engine', 'ejs')
-app.use(express.urlencoded({ extended: false }))
-app.use(express.json({ limit: '100kb' }))
+app.use(express.urlencoded({ extended: false })) // converts form data into url-encoded form
+app.use(express.json({ limit: '100kb' })) // prevents large requests
 app.use(flash())
 app.use(session({
    name: 'notevault.sid',
-   secret: process.env.SESSION_SECRET,
-   resave: false,
-   saveUninitialized: false,
+   secret: process.env.SESSION_SECRET, // signs cookie with secret
+   resave: false, // does not save an unchanged session on every request
+   saveUninitialized: false, // do not create a session until something is stored in it
    cookie: {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 1000
+      httpOnly: true, 
+      sameSite: 'lax', 
+      secure: process.env.NODE_ENV === 'production', // use https in production
+      maxAge: 60 * 60 * 1000 // 1 hour
    }
 }))
 
@@ -98,12 +97,12 @@ app.get('/register', (req, res) => {
 app.post('/login', passport.authenticate('local', {
    successRedirect: '/',
    failureRedirect: 'login',
-   failureFlash: true
+   failureFlash: true // save failure message temporarily
 }))
 
 app.post('/register', async (req, res) => {
    try {
-      const hashedPassword = await bcrypt.hash(req.body.password, 10)
+      const hashedPassword = await bcrypt.hash(req.body.password, 10) // bcrypt creates own salt
 
       const encryptionSalt = randomBytes(16).toString('base64')
 
